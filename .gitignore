@@ -1,13 +1,6 @@
-__pycache__/
-*.pyc
+node_modules/
 .env
-data/*.json
-!data/.gitkeep
-.venv/
-venv/
-*.egg-info/
-build/
-dist/
-.idea/
-.vscode/
+*.zip
 *.log
+dist/
+

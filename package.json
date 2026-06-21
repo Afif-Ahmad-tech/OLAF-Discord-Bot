@@ -1,0 +1,19 @@
+{
+  "name": "olaf-discord-bot",
+  "version": "1.0.0",
+  "description": "OLAF is a Discord bot with slash commands, simple chat replies, and an optional OpenAI-powered answer command.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy:commands": "node src/register-commands.js"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "openai": "^4.56.0"
+  }
+}
