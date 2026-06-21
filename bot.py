@@ -98,7 +98,7 @@ class OlafBot(commands.Bot):
                 self.logger.exception("Reminder loop error: %s", exc)
             await asyncio.sleep(15)
 
-    async def on_ready(self) -> None:
+async def on_ready(self) -> None:
     if self.user is None:
         return
 
@@ -122,17 +122,6 @@ class OlafBot(commands.Bot):
         ),
         status=discord.Status.online,
     )
-    
-def configure_logging() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-    # Silence noisy libs
-    logging.getLogger("discord").setLevel(logging.WARNING)
-    logging.getLogger("aiohttp").setLevel(logging.WARNING)
-
 
 def main() -> int:
     configure_logging()
