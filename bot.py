@@ -63,7 +63,7 @@ class OlafBot(commands.Bot):
         await self.wait_until_ready()
         import time
 
-        while not self.is_closed():
+        while not self.is_ready():
             try:
                 now = time.time()
                 due = self.data.due_reminders(now)
@@ -123,20 +123,36 @@ async def on_ready(self) -> None:
         status=discord.Status.online,
     )
 
+
+def configure_logging() -> None:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+    logging.getLogger("discord").setLevel(logging.WARNING)
+    logging.getLogger("aiohttp").setLevel(logging.WARNING)
+
+
 def main() -> int:
     configure_logging()
+
     try:
         settings = load_settings()
     except RuntimeError as exc:
         print(f"[olaf] {exc}", file=sys.stderr)
         return 1
+
     data = DataManager()
     bot = OlafBot(settings, data)
+
     try:
         bot.run(settings.token, log_handler=None)
     except discord.LoginFailure:
         print("[olaf] Invalid Discord token. Double check DISCORD_TOKEN in .env", file=sys.stderr)
         return 1
+
     return 0
 
 
