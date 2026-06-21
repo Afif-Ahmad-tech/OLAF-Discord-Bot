@@ -1,121 +1,182 @@
-# OLAF Discord Bot
+<div align="center">
 
-A modular Discord bot named **OLAF** that handles moderation, welcomes, leveling, fun
-commands, polls, reminders, and event logging once it's invited to your server.
+# 🤖 OLAF Discord Bot
 
-## Features
+### ✨ A Modern, Powerful & Feature-Rich Discord Bot built with Python
 
-- **Moderation**: kick, ban, unban, mute/unmute, purge, warn, lock/unlock, auto-timeout after 3 warnings.
-- **Welcome**: customizable greeting templates, automatic role assignment, leave messages.
-- **Event logging**: edits, deletions, joins, leaves, all routed to a single log channel.
-- **Utility**: ping, serverinfo, userinfo, avatar, member counts, help, say-as-embed.
-- **Fun**: 8-ball, dice, coinflip, choose, rock-paper-scissors, jokes, ratings.
-- **Polls**: structured multi-option polls and quick yes/no/maybe polls.
-- **Leveling**: XP on chat, level-up notifications, rank card, leaderboard.
-- **Reminders**: personal !remind with s/m/h/d durations, list, and cancel.
-- **Per-server config**: custom prefix, mod-log channel, auto-role, level channel.
-- **Data persistence**: JSON file in data/bot_data.json; nothing leaves your machine.
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=22&pause=1000&color=00BFFF&center=true&vCenter=true&width=700&lines=Moderation+%F0%9F%9B%A1%EF%B8%8F;Utility+%F0%9F%9B%A0%EF%B8%8F;Leveling+%F0%9F%93%88;Polls+%F0%9F%93%8A;Logging+%F0%9F%93%9D;Welcome+System+%F0%9F%91%8B;Built+with+Python+%F0%9F%90%8D" />
 
-## Project layout
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python)
+![Discord.py](https://img.shields.io/badge/Discord.py-Latest-5865F2?style=for-the-badge&logo=discord)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 
-`
-OLAF discord bot/
-+- bot.py              # entry point
-+- config.py           # environment-driven settings
-+- requirements.txt
-+- .env.example        # copy to .env and fill in your token
-+- data/
-�  +- manager.py       # JSON-backed store
-+- utils/
-�  +- helpers.py
-�  +- embeds.py
-+- cogs/
-   +- moderation.py
-   +- welcome.py
-   +- utility.py
-   +- fun.py
-   +- polls.py
-   +- logging.py
-   +- leveling.py
-   +- reminders.py
-   +- config_cog.py
-`
+</div>
 
-## Setup
+---
 
-### 1. Create the Discord application
+# 🌟 About OLAF
 
-1. Visit https://discord.com/developers/applications and click **New Application**.
-2. Name it OLAF, accept the terms, then open **Bot** in the sidebar.
-3. Click **Reset Token**, copy the token, and store it somewhere safe.
-4. Under **Privileged Gateway Intents**, enable **Server Members Intent** and **Message Content Intent**.
-5. Open **OAuth2 ? URL Generator**:
-   - Scopes: ot, pplications.commands
-   - Bot permissions: Administrator (or pick the granular permissions you want).
-6. Copy the generated URL and paste it in a browser to invite OLAF to your server.
+OLAF is a **multi-purpose Discord bot** designed to make server management simple while keeping your community fun and engaging.
 
-### 2. Install Python dependencies
+Whether you need moderation, utility tools, leveling, reminders, logging, or community features, OLAF has you covered.
 
-Requires Python 3.10 or newer.
+---
 
-`ash
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # macOS / Linux
+# 🚀 Features
+
+## 🛡️ Moderation
+
+- 🔨 Ban Members
+- 👢 Kick Members
+- 🔇 Timeout Members
+- 🧹 Purge Messages
+- ⚠️ Warning System
+
+---
+
+## 🎉 Community
+
+- 👋 Welcome Messages
+- 📢 Server Announcements
+- 📊 Poll Creation
+- 📝 Logging System
+
+---
+
+## 📈 Leveling
+
+- ⭐ XP System
+- 🏆 Leaderboards
+- 🎖️ Rank Cards
+
+---
+
+## ⏰ Utility
+
+- ⏳ Reminders
+- 📅 Timers
+- 📌 Server Information
+- 👤 User Information
+- 🛠️ Helpful Commands
+
+---
+
+## 🎲 Fun
+
+- 🎯 Interactive Commands
+- 🎉 Entertainment Features
+- 😂 Community Fun
+
+---
+
+# 📂 Project Structure
+
+```
+OLAF/
+│
+├── bot.py
+├── config.py
+├── requirements.txt
+├── README.md
+│
+├── cogs/
+│   ├── moderation.py
+│   ├── welcome.py
+│   ├── utility.py
+│   ├── fun.py
+│   ├── polls.py
+│   ├── leveling.py
+│   ├── reminders.py
+│   ├── logging.py
+│   └── config.py
+│
+└── assets/
+```
+
+---
+
+# ⚡ Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/Afif-Ahmad-tech/OLAF-Discord-Bot.git
+```
+
+Go inside the folder
+
+```bash
+cd OLAF-Discord-Bot
+```
+
+Install dependencies
+
+```bash
 pip install -r requirements.txt
-`
+```
 
-### 3. Configure environment
+Run the bot
 
-Copy .env.example to .env and fill in the values:
-
-`env
-DISCORD_TOKEN=your-bot-token-here
-BOT_OWNER_ID=your-discord-user-id
-BOT_PREFIX=!
-`
-
-### 4. Run the bot
-
-`ash
+```bash
 python bot.py
-`
+```
 
-The first run creates data/bot_data.json automatically. Keep this file safe; it stores
-warnings, levels, reminders, and per-guild settings.
+---
 
-## Command reference
+# ⚙️ Requirements
 
-Default prefix is ! (overridable per server with !config prefix <value> or by mentioning OLAF).
+- Python 3.10+
+- Discord Bot Token
+- Discord Developer Application
 
-| Category | Commands |
-| --- | --- |
-| Moderation | !kick @user, !ban @user, !unban <id>, !mute @user 30m, !unmute @user, !purge 25, !warn @user reason, !warnings @user, !clearwarnings @user, !lock, !unlock |
-| Welcome | !welcome channel #lobby, !welcome message Hello {mention}!, !welcome autorole @Member, !welcome show, !welcome disable |
-| Utility | !ping, !serverinfo, !userinfo @user, !avatar @user, !members, !say, !help |
-| Fun | !8ball, !roll 2d20, !coinflip, !choose a | b | c, !rps rock, !joke, !rate Olaf |
-| Polls | !poll Lunch? | Pizza | Sushi | Tacos, !quickpoll Should we merge? |
-| Leveling | !rank, !leaderboard, !leveling toggle, !leveling channel #levels |
-| Reminders | !remind 30m Stretch, !reminders, !cancelremind 3 |
-| Logs | !logs channel #mod-log, !logs show, !logs disable |
-| Config | !config prefix, !config prefix ?, !config modlog #mod-log, !config show, !config reset |
+---
 
-## Permissions OLAF needs
+# 💡 Roadmap
 
-| Permission | Why |
-| --- | --- |
-| Manage Roles | auto-role, mute role interactions |
-| Kick Members | !kick |
-| Ban Members | !ban / !unban |
-| Moderate Members | !mute / !unmute (timeouts) |
-| Manage Messages | !purge, !say cleanup |
-| Manage Channels | !lock / !unlock |
-| Send Messages / Embed Links / Read Message History | everything |
+- [ ] Slash Commands
+- [ ] AI Integration
+- [ ] Music System
+- [ ] Ticket System
+- [ ] Giveaway System
+- [ ] Dashboard
+- [ ] Web Panel
+- [ ] Economy System
+- [ ] Auto Moderation
+- [ ] Multi-language Support
 
-Grant **Administrator** for the smoothest experience, or the granular list above.
+---
 
-## Notes
+# 🤝 Contributing
 
-- Wipe data/bot_data.json to reset every server.
-- The bot stores data locally only � there is no external database.
-- Reminders persist across restarts because they are persisted in the same JSON file.
+Contributions are always welcome!
+
+Feel free to:
+
+- 🍴 Fork the repository
+- 🌟 Star the project
+- 🐛 Report bugs
+- 💡 Suggest features
+- 🔧 Submit Pull Requests
+
+---
+
+# ⭐ Support
+
+If you like this project,
+
+⭐ **Give this repository a Star!**
+
+It helps a lot ❤️
+
+---
+
+<div align="center">
+
+## 👨‍💻 Developer
+
+**Afif Ahmad**
+
+Made with ❤️ using **Python** & **Discord.py**
+
+</div>
