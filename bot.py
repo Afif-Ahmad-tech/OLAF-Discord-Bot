@@ -99,23 +99,29 @@ class OlafBot(commands.Bot):
             await asyncio.sleep(15)
 
     async def on_ready(self) -> None:
-        if self.user is None:
-            return
-        self.logger.info(
-            "Logged in as %s (id=%s) in %d guild(s)",
-            self.user,
-            self.user.id,
-            len(self.guilds),
-        )
-        try:
-    synced = await self.tree.sync()
-    self.logger.info("Synced %d slash command(s)", len(synced))
-except Exception as exc:
-    self.logger.exception("Failed to sync slash commands: %s", exc)
-        await self.change_presence(
-            activity=discord.Activity(type=discord.ActivityType.watching, name=f"{self.settings.prefix}help"),
-            status=discord.Status.online,
-        )
+    if self.user is None:
+        return
+
+    self.logger.info(
+        "Logged in as %s (id=%s) in %d guild(s)",
+        self.user,
+        self.user.id,
+        len(self.guilds),
+    )
+
+    try:
+        synced = await self.tree.sync()
+        self.logger.info("Synced %d slash command(s)", len(synced))
+    except Exception as exc:
+        self.logger.exception("Failed to sync slash commands: %s", exc)
+
+    await self.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.watching,
+            name=f"{self.settings.prefix}help",
+        ),
+        status=discord.Status.online,
+    )
 
 
 def configure_logging() -> None:
