@@ -4,6 +4,7 @@ import io
 
 import discord
 from discord.ext import commands
+from discord import app_commands
 
 from config import Settings
 from data.manager import DataManager
@@ -117,6 +118,33 @@ class Utility(commands.Cog):
         embed.set_footer(text=f"Tip: run {prefix}help <command> on individual cogs for details.")
         await ctx.send(embed=embed)
 
+    @app_commands.command(
+    name="help",
+    description="Shows all available OLAF commands."
+)
+async def slash_help(self, interaction: discord.Interaction):
+    embed = embeds.info(
+        self.settings,
+        "",
+        title=f"{self.settings.bot_name} Help"
+    )
+
+    embed.description = (
+        "## 📚 Command Categories\n\n"
+        "🛡️ Moderation\n"
+        "👋 Welcome\n"
+        "🛠️ Utility\n"
+        "🎉 Fun\n"
+        "📊 Polls\n"
+        "⭐ Leveling\n"
+        "⏰ Reminders\n"
+        "⚙️ Configuration\n"
+        "📝 Logging\n\n"
+        "Type `/` to see every available command."
+    )
+
+    await interaction.response.send_message(embed=embed)
+
     async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=embeds.error(self.settings, "You need the Manage Messages permission for that."))
@@ -124,5 +152,6 @@ class Utility(commands.Cog):
         await ctx.send(embed=embeds.error(self.settings, f"Something went wrong: {error}"))
 
 
-async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(Utility(bot))
+async def setup(bot: commands.Bot):
+    cog = Utility(bot)
+    await bot.add_cog(cog)
