@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import platform
+from datetime import timedelta
+
 import discord
 from discord.ext import commands
-from discord import app_commands
 
 from config import Settings
 from data.manager import DataManager
@@ -12,344 +14,23 @@ from utils import embeds, helpers
 class Utility(commands.Cog):
     """OLAF Utility Commands"""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.settings: Settings = bot.settings
         self.data: DataManager = bot.data
 
-    # --------------------------------------------------
-    # PING
-    # --------------------------------------------------
+    # ----------------------------------------------------
+    # HELP
+    # ----------------------------------------------------
 
-    @commands.command(name="ping")
-    @commands.cooldown(1, 5, commands.BucketType.channel)
-    async def ping(self, ctx: commands.Context) -> None:
-        """Shows bot latency."""
-
-        latency = round(self.bot.latency * 1000)
-
-        uptime = (
-            discord.utils.utcnow() - self.bot.started_at
-            if hasattr(self.bot, "started_at")
-            else None
-        )
-
-        description = f"🏓 **Latency:** `{latency} ms`"
-
-        if uptime:
-            description += (
-                f"\n⏱️ **Uptime:** "
-                f"`{helpers.format_duration(int(uptime.total_seconds()))}`"
-            )
-
-        embed = embeds.info(
-            self.settings,
-            description,
-            title="Pong!"
-        )
-
-        if self.bot.user:
-            embed.set_thumbnail(
-                url=self.bot.user.display_avatar.url
-            )
-
-        await ctx.send(embed=embed)
-
-    # --------------------------------------------------
-    # SERVER INFO
-    # --------------------------------------------------
-
-    @commands.command(
-        name="serverinfo",
-        aliases=["guildinfo", "server"]
+    @commands.hybrid_command(
+        name="help",
+        description="Shows every available command."
     )
-    async def serverinfo(
-        self,
-        ctx: commands.Context
-    ) -> None:
-
-        if ctx.guild is None:
-            return
-
-        guild = ctx.guild
-
-        embed = embeds.info(
-            self.settings,
-            "",
-            title=guild.name
-        )
-
-        if guild.icon:
-            embed.set_thumbnail(
-                url=guild.icon.url
-            )
-
-        if guild.banner:
-            embed.set_image(
-                url=guild.banner.url
-            )
-
-        owner = guild.owner.mention if guild.owner else "Unknown"
-
-        embed.add_field(
-            name="👑 Owner",
-            value=owner,
-            inline=True
-        )
-
-        embed.add_field(
-            name="👥 Members",
-            value=str(guild.member_count),
-            inline=True
-        )
-
-        embed.add_field(
-            name="📅 Created",
-            value=helpers.format_dt(
-                guild.created_at,
-                "R",
-            ),
-            inline=True,
-        )
-
-        embed.add_field(
-            name="💬 Channels",
-            value=(
-                f"Text: **{len(guild.text_channels)}**\n"
-                f"Voice: **{len(guild.voice_channels)}**\n"
-                f"Stage: **{len(guild.stage_channels)}**"
-            ),
-            inline=True,
-        )
-
-        embed.add_field(
-            name="🎭 Roles",
-            value=str(len(guild.roles)),
-            inline=True,
-        )
-
-        embed.add_field(
-            name="😀 Emojis",
-            value=str(len(guild.emojis)),
-            inline=True,
-        )
-
-        embed.add_field(
-            name="🚀 Boosts",
-            value=(
-                f"Level **{guild.premium_tier}**\n"
-                f"Boosts **{guild.premium_subscription_count}**"
-            ),
-            inline=False,
-        )
-
-        if guild.description:
-            embed.add_field(
-                name="📝 Description",
-                value=guild.description,
-                inline=False,
-            )
-
-        embed.set_footer(
-            text=f"Server ID: {guild.id}"
-        )
-
-        await ctx.send(embed=embed)
-
-    # --------------------------------------------------
-    # USER INFO
-    # --------------------------------------------------
-        @commands.command(name="userinfo", aliases=["whois"])
-    async def userinfo(
+    async def help(
         self,
         ctx: commands.Context,
-        member: discord.Member | None = None,
-    ) -> None:
-
-        target = member or ctx.author
-
-        embed = embeds.info(
-            self.settings,
-            "",
-            title=f"{target}",
-        )
-
-        embed.set_thumbnail(
-            url=target.display_avatar.url
-        )
-
-        embed.add_field(
-            name="🆔 User ID",
-            value=str(target.id),
-            inline=False,
-        )
-
-        embed.add_field(
-            name="📅 Account Created",
-            value=helpers.format_dt(
-                target.created_at,
-                "R",
-            ),
-            inline=True,
-        )
-
-        if isinstance(target, discord.Member):
-
-            embed.add_field(
-                name="📥 Joined Server",
-                value=helpers.format_dt(
-                    target.joined_at,
-                    "R",
-                ),
-                inline=True,
-            )
-
-            roles = [
-                role.mention
-                for role in target.roles
-                if role != ctx.guild.default_role
-            ]
-
-            if roles:
-                embed.add_field(
-                    name=f"🎭 Roles ({len(roles)})",
-                    value=", ".join(roles[:20]),
-                    inline=False,
-                )
-
-            embed.add_field(
-                name="⭐ Top Role",
-                value=target.top_role.mention,
-                inline=True,
-            )
-
-            embed.add_field(
-                name="🤖 Bot",
-                value="Yes" if target.bot else "No",
-                inline=True,
-            )
-
-            embed.add_field(
-                name="🟢 Status",
-                value=str(target.status).title(),
-                inline=True,
-            )
-
-        await ctx.send(embed=embed)
-
-    # --------------------------------------------------
-    # AVATAR
-    # --------------------------------------------------
-
-    @commands.command(
-        name="avatar",
-        aliases=["pfp", "icon"]
-    )
-    async def avatar(
-        self,
-        ctx: commands.Context,
-        member: discord.Member | None = None,
-    ) -> None:
-
-        target = member or ctx.author
-
-        embed = embeds.info(
-            self.settings,
-            f"[Click here to open avatar]({target.display_avatar.url})",
-            title=f"{target.display_name}'s Avatar",
-        )
-
-        embed.set_image(
-            url=target.display_avatar.url
-        )
-
-        embed.set_footer(
-            text=f"Requested by {ctx.author}"
-        )
-
-        await ctx.send(embed=embed)
-
-    # --------------------------------------------------
-    # MEMBER COUNT
-    # --------------------------------------------------
-
-    @commands.command(name="members")
-    async def members(
-        self,
-        ctx: commands.Context,
-    ) -> None:
-
-        if ctx.guild is None:
-            return
-
-        guild = ctx.guild
-
-        humans = sum(
-            not member.bot
-            for member in guild.members
-        )
-
-        bots = sum(
-            member.bot
-            for member in guild.members
-        )
-
-        online = sum(
-            member.status != discord.Status.offline
-            for member in guild.members
-        )
-
-        embed = embeds.info(
-            self.settings,
-            (
-                f"👥 **Total Members:** {guild.member_count}\n"
-                f"🧑 **Humans:** {humans}\n"
-                f"🤖 **Bots:** {bots}\n"
-                f"🟢 **Online:** {online}"
-            ),
-            title="Member Statistics",
-        )
-
-        await ctx.send(embed=embed)
-
-    # --------------------------------------------------
-    # SAY
-    # --------------------------------------------------
-
-    @commands.command(name="say")
-    @commands.has_permissions(
-        manage_messages=True
-    )
-    async def say(
-        self,
-        ctx: commands.Context,
-        *,
-        message: str,
-    ) -> None:
-
-        try:
-            await ctx.message.delete()
-        except (
-            discord.Forbidden,
-            discord.HTTPException,
-        ):
-            pass
-
-        embed = embeds.info(
-            self.settings,
-            message,
-        )
-
-        await ctx.send(embed=embed)
-
-    # --------------------------------------------------
-    # HELP COMMAND
-    # --------------------------------------------------
-        @commands.command(name="help")
-    async def help_cmd(
-        self,
-        ctx: commands.Context,
-    ) -> None:
+    ):
 
         prefix = (
             self.data.get_setting(
@@ -361,45 +42,50 @@ class Utility(commands.Cog):
             else self.settings.prefix
         )
 
-        embed = embeds.info(
-            self.settings,
-            "",
-            title=f"{self.settings.bot_name} Help",
+        embed = discord.Embed(
+            title=f"🤖 {self.settings.bot_name}",
+            description="Professional Discord Management Bot",
+            color=self.settings.embed_color,
         )
 
-        embed.description = (
-            f"Use `{prefix}` before commands.\n\n"
-            "**Available Categories**\n"
-            "🛡️ Moderation\n"
-            "👋 Welcome\n"
-            "🛠️ Utility\n"
-            "🎮 Fun\n"
-            "📊 Polls\n"
-            "⭐ Leveling\n"
-            "⏰ Reminders\n"
-            "⚙️ Configuration\n"
-            "📝 Logging"
+        embed.add_field(
+            name="🛠 Utility",
+            value=(
+                f"`{prefix}ping`\n"
+                f"`{prefix}userinfo`\n"
+                f"`{prefix}serverinfo`\n"
+                f"`{prefix}avatar`\n"
+                f"`{prefix}members`\n"
+                f"`{prefix}uptime`\n"
+                f"`{prefix}botinfo`"
+            ),
+            inline=True,
         )
 
-        for cog_name, cog in sorted(self.bot.cogs.items()):
+        embed.add_field(
+            name="🛡 Moderation",
+            value=(
+                "Kick\n"
+                "Ban\n"
+                "Mute\n"
+                "Warn\n"
+                "Clear"
+            ),
+            inline=True,
+        )
 
-            commands_list = [
-                f"`{prefix}{command.name}`"
-                for command in cog.get_commands()
-                if not command.hidden
-            ]
-
-            if not commands_list:
-                continue
-
-            embed.add_field(
-                name=f"📂 {cog_name}",
-                value="\n".join(commands_list[:10]),
-                inline=False,
-            )
+        embed.add_field(
+            name="🎉 Fun",
+            value=(
+                "Polls\n"
+                "Reminders\n"
+                "More coming soon..."
+            ),
+            inline=False,
+        )
 
         embed.set_footer(
-            text=f"{self.settings.bot_name} • {self.settings.version}"
+            text=f"Version {self.settings.version}"
         )
 
         if self.bot.user:
@@ -409,79 +95,456 @@ class Utility(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    # --------------------------------------------------
-    # SLASH HELP
-    # --------------------------------------------------
+    # ----------------------------------------------------
+    # PING
+    # ----------------------------------------------------
 
-    @app_commands.command(
-        name="help",
-        description="Shows all available OLAF commands.",
+    @commands.hybrid_command(
+        name="ping",
+        description="Shows bot latency."
     )
-    async def slash_help(
+    async def ping(
         self,
-        interaction: discord.Interaction,
-    ) -> None:
+        ctx: commands.Context,
+    ):
 
-        prefix = (
-            self.data.get_setting(
-                interaction.guild.id,
-                "prefix",
-                self.settings.prefix,
-            )
-            if interaction.guild
-            else self.settings.prefix
-        )
+        latency = round(self.bot.latency * 1000)
 
-        embed = discord.Embed(
-            title=f"🤖 {self.settings.bot_name} Help",
-            description=(
-                "## 📚 Available Categories\n\n"
-                "🛡️ **Moderation**\n"
-                "👋 **Welcome**\n"
-                "🛠️ **Utility**\n"
-                "🎮 **Fun**\n"
-                "📊 **Polls**\n"
-                "⭐ **Leveling**\n"
-                "⏰ **Reminders**\n"
-                "⚙️ **Configuration**\n"
-                "📝 **Logging**"
+        uptime = discord.utils.utcnow() - self.bot.started_at
+
+        embed = embeds.success(
+            self.settings,
+            (
+                f"🏓 **Latency:** `{latency} ms`\n"
+                f"⏰ **Uptime:** `{helpers.format_duration(int(uptime.total_seconds()))}`"
             ),
-            color=self.settings.embed_color,
+            title="Pong!"
         )
-
-        embed.add_field(
-            name="💬 Prefix Commands",
-            value=f"`{prefix}help`",
-            inline=False,
-        )
-
-        slash_commands = []
-
-        for command in self.bot.tree.walk_commands():
-            slash_commands.append(f"`/{command.qualified_name}`")
-
-        if slash_commands:
-
-            embed.add_field(
-                name="⚡ Slash Commands",
-                value="\n".join(slash_commands[:20]),
-                inline=False,
-            )
 
         if self.bot.user:
             embed.set_thumbnail(
                 url=self.bot.user.display_avatar.url
             )
 
+        await ctx.send(embed=embed)
+            # ----------------------------------------------------
+    # USER INFO
+    # ----------------------------------------------------
+
+    @commands.hybrid_command(
+        name="userinfo",
+        description="Shows information about a user."
+    )
+    async def userinfo(
+        self,
+        ctx: commands.Context,
+        member: discord.Member | None = None,
+    ):
+
+        member = member or ctx.author
+
+        embed = discord.Embed(
+            title=f"👤 {member}",
+            color=self.settings.embed_color,
+            timestamp=discord.utils.utcnow(),
+        )
+
+        embed.set_thumbnail(url=member.display_avatar.url)
+
+        embed.add_field(
+            name="🆔 User ID",
+            value=str(member.id),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="🤖 Bot",
+            value="Yes" if member.bot else "No",
+            inline=True,
+        )
+
+        embed.add_field(
+            name="🎭 Top Role",
+            value=member.top_role.mention,
+            inline=True,
+        )
+
+        if member.joined_at:
+            embed.add_field(
+                name="📥 Joined Server",
+                value=helpers.format_dt(member.joined_at, "R"),
+                inline=False,
+            )
+
+        embed.add_field(
+            name="📅 Discord Account",
+            value=helpers.format_dt(member.created_at, "R"),
+            inline=False,
+        )
+
+        roles = [r.mention for r in member.roles if r != ctx.guild.default_role]
+
+        if roles:
+            embed.add_field(
+                name=f"🎖 Roles ({len(roles)})",
+                value=", ".join(roles[:15]) + ("..." if len(roles) > 15 else ""),
+                inline=False,
+            )
+
         embed.set_footer(
-            text=f"{self.settings.bot_name} • Version {self.settings.version}"
+            text=f"Requested by {ctx.author}",
+            icon_url=ctx.author.display_avatar.url,
         )
 
-        await interaction.response.send_message(
-            embed=embed
+        await ctx.send(embed=embed)
+
+    # ----------------------------------------------------
+    # SERVER INFO
+    # ----------------------------------------------------
+
+    @commands.hybrid_command(
+        name="serverinfo",
+        aliases=["guildinfo"],
+        description="Shows server information."
+    )
+    async def serverinfo(
+        self,
+        ctx: commands.Context,
+    ):
+
+        guild = ctx.guild
+
+        if guild is None:
+            return
+
+        embed = discord.Embed(
+            title=f"🏠 {guild.name}",
+            color=self.settings.embed_color,
+            timestamp=discord.utils.utcnow(),
         )
 
-async def setup(bot: commands.Bot) -> None:
+        if guild.icon:
+            embed.set_thumbnail(url=guild.icon.url)
+
+        if guild.banner:
+            embed.set_image(url=guild.banner.url)
+
+        embed.add_field(
+            name="👑 Owner",
+            value=guild.owner.mention if guild.owner else "Unknown",
+            inline=True,
+        )
+
+        embed.add_field(
+            name="👥 Members",
+            value=str(guild.member_count),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="🎭 Roles",
+            value=str(len(guild.roles)),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="💬 Text Channels",
+            value=str(len(guild.text_channels)),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="🔊 Voice Channels",
+            value=str(len(guild.voice_channels)),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="😀 Emojis",
+            value=str(len(guild.emojis)),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="🚀 Boost Level",
+            value=f"Level {guild.premium_tier}",
+            inline=True,
+        )
+
+        embed.add_field(
+            name="✨ Boosts",
+            value=str(guild.premium_subscription_count),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="📅 Created",
+            value=helpers.format_dt(guild.created_at, "R"),
+            inline=False,
+        )
+
+        embed.set_footer(
+            text=f"Server ID: {guild.id}"
+        )
+
+        await ctx.send(embed=embed)
+
+    # ----------------------------------------------------
+    # AVATAR
+    # ----------------------------------------------------
+
+    @commands.hybrid_command(
+        name="avatar",
+        description="Shows a user's avatar."
+    )
+    async def avatar(
+        self,
+        ctx: commands.Context,
+        member: discord.Member | None = None,
+    ):
+
+        member = member or ctx.author
+
+        embed = discord.Embed(
+            title=f"🖼 {member.display_name}'s Avatar",
+            color=self.settings.embed_color,
+        )
+
+        embed.set_image(url=member.display_avatar.url)
+
+        embed.description = (
+            f"[🔗 Open Original]({member.display_avatar.url})"
+        )
+
+        await ctx.send(embed=embed)
+
+    # ----------------------------------------------------
+    # MEMBER COUNT
+    # ----------------------------------------------------
+
+    @commands.hybrid_command(
+        name="members",
+        description="Shows server member statistics."
+    )
+    async def members(
+        self,
+        ctx: commands.Context,
+    ):
+
+        guild = ctx.guild
+
+        if guild is None:
+            return
+
+        humans = sum(not m.bot for m in guild.members)
+        bots = sum(m.bot for m in guild.members)
+        online = sum(
+            m.status != discord.Status.offline
+            for m in guild.members
+        )
+
+        embed = discord.Embed(
+            title="👥 Member Statistics",
+            color=self.settings.embed_color,
+        )
+
+        embed.add_field(
+            name="Total Members",
+            value=str(guild.member_count),
+        )
+
+        embed.add_field(
+            name="Humans",
+            value=str(humans),
+        )
+
+        embed.add_field(
+            name="Bots",
+            value=str(bots),
+        )
+
+        embed.add_field(
+            name="Online",
+            value=str(online),
+        )
+
+        await ctx.send(embed=embed)
+            # ----------------------------------------------------
+    # BOT INFO
+    # ----------------------------------------------------
+
+    @commands.hybrid_command(
+        name="botinfo",
+        description="Shows information about OLAF."
+    )
+    async def botinfo(
+        self,
+        ctx: commands.Context,
+    ):
+
+        guilds = len(self.bot.guilds)
+        users = sum(g.member_count or 0 for g in self.bot.guilds)
+
+        uptime = discord.utils.utcnow() - self.bot.started_at
+
+        embed = discord.Embed(
+            title=f"🤖 {self.settings.bot_name}",
+            description="Professional Discord Management Bot",
+            color=self.settings.embed_color,
+            timestamp=discord.utils.utcnow(),
+        )
+
+        if self.bot.user:
+            embed.set_thumbnail(
+                url=self.bot.user.display_avatar.url
+            )
+
+        embed.add_field(
+            name="🏠 Servers",
+            value=str(guilds),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="👥 Users",
+            value=f"{users:,}",
+            inline=True,
+        )
+
+        embed.add_field(
+            name="🏓 Latency",
+            value=f"{round(self.bot.latency * 1000)} ms",
+            inline=True,
+        )
+
+        embed.add_field(
+            name="🐍 Python",
+            value=platform.python_version(),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="📦 discord.py",
+            value=discord.__version__,
+            inline=True,
+        )
+
+        embed.add_field(
+            name="⏰ Uptime",
+            value=helpers.format_duration(
+                int(uptime.total_seconds())
+            ),
+            inline=True,
+        )
+
+        embed.add_field(
+            name="📌 Version",
+            value=self.settings.version,
+            inline=True,
+        )
+
+        embed.set_footer(
+            text="OLAF v2"
+        )
+
+        await ctx.send(embed=embed)
+
+    # ----------------------------------------------------
+    # UPTIME
+    # ----------------------------------------------------
+
+    @commands.hybrid_command(
+        name="uptime",
+        description="Shows how long the bot has been online."
+    )
+    async def uptime(
+        self,
+        ctx: commands.Context,
+    ):
+
+        delta = discord.utils.utcnow() - self.bot.started_at
+
+        embed = embeds.success(
+            self.settings,
+            f"⏰ **{helpers.format_duration(int(delta.total_seconds()))}**",
+            title="Bot Uptime"
+        )
+
+        await ctx.send(embed=embed)
+
+    # ----------------------------------------------------
+    # SAY
+    # ----------------------------------------------------
+
+    @commands.hybrid_command(
+        name="say",
+        description="Make OLAF say something."
+    )
+    @commands.has_permissions(manage_messages=True)
+    async def say(
+        self,
+        ctx: commands.Context,
+        *,
+        message: str,
+    ):
+
+        try:
+            await ctx.message.delete()
+        except (discord.Forbidden, discord.NotFound, AttributeError):
+            pass
+
+        embed = discord.Embed(
+            description=message,
+            color=self.settings.embed_color,
+        )
+
+        await ctx.send(embed=embed)
+
+    # ----------------------------------------------------
+    # ERROR HANDLER
+    # ----------------------------------------------------
+
+    async def cog_command_error(
+        self,
+        ctx: commands.Context,
+        error: commands.CommandError,
+    ):
+
+        if isinstance(error, commands.MissingPermissions):
+
+            await ctx.send(
+                embed=embeds.error(
+                    self.settings,
+                    "❌ You don't have permission to use this command."
+                )
+            )
+            return
+
+        if isinstance(error, commands.CommandOnCooldown):
+
+            await ctx.send(
+                embed=embeds.warning(
+                    self.settings,
+                    f"⏳ Try again in **{error.retry_after:.1f} seconds**."
+                )
+            )
+            return
+
+        if isinstance(error, commands.BadArgument):
+
+            await ctx.send(
+                embed=embeds.error(
+                    self.settings,
+                    "❌ Invalid command arguments."
+                )
+            )
+            return
+
+        raise error
+
+
+async def setup(bot: commands.Bot):
+
     await bot.add_cog(
         Utility(bot)
     )
