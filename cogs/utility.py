@@ -25,7 +25,8 @@ class Utility(commands.Cog):
         latency_ms = round(self.bot.latency * 1000)
         uptime = discord.utils.utcnow() - self.bot.started_at
         embed = embeds.info(self.settings, f"Latency: **{latency_ms} ms**\nUptime: **{helpers.format_duration(int(uptime.total_seconds()))}**", title="Pong")
-        embed.set_thumbnail(url=self.bot.user.display_avatar.url if self.bot.user else discord.Embed.Empty)
+        if self.bot.user:
+            embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         await ctx.send(embed=embed)
 
     @commands.command(name="serverinfo", aliases=["guildinfo"])
@@ -98,7 +99,10 @@ class Utility(commands.Cog):
     @commands.command(name="say")
     @commands.has_permissions(manage_messages=True)
     async def say(self, ctx: commands.Context, *, message: str) -> None:
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            pass
         embed = embeds.info(self.settings, message)
         await ctx.send(embed=embed)
 
@@ -111,10 +115,13 @@ class Utility(commands.Cog):
             "**utility**, **fun**, **polls**, **leveling**, **reminders**, **config**, **logging**."
         )
         for cog_name, cog in self.bot.cogs.items():
-            commands_list = [cog.get_slash_commands()] if hasattr(cog, "get_slash_commands") else []
             shown = [f"{prefix}{cmd.name}" for cmd in cog.get_commands() if not cmd.hidden][:6]
             if shown:
-                embed.add_field(name=cog_name, value=" ".join(shown), inline=False)
+                embed.add_field(
+                    name=f"📂 {cog_name}",
+                    value="\n".join(f"`{cmd}`" for cmd in shown),
+                    inline=False,
+                )
         embed.set_footer(text=f"Tip: run {prefix}help <command> on individual cogs for details.")
         await ctx.send(embed=embed)
 
@@ -123,35 +130,46 @@ class Utility(commands.Cog):
     description="Shows all available OLAF commands."
 )
 async def slash_help(self, interaction: discord.Interaction):
-    embed = embeds.info(
-        self.settings,
-        "",
-        title=f"{self.settings.bot_name} Help"
+    prefix = self.data.get_setting(
+        interaction.guild.id,
+        "prefix",
+        self.settings.prefix,
+    ) if interaction.guild else self.settings.prefix
+
+    embed = discord.Embed(
+        title=f"🤖 {self.settings.bot_name} Help",
+        description=(
+            "## 📚 Available Categories\n\n"
+            "🛡️ **Moderation**\n"
+            "👋 **Welcome**\n"
+            "🛠️ **Utility**\n"
+            "🎉 **Fun**\n"
+            "📊 **Polls**\n"
+            "⭐ **Leveling**\n"
+            "⏰ **Reminders**\n"
+            "⚙️ **Configuration**\n"
+            "📝 **Logging**"
+        ),
+        color=self.settings.embed_color,
     )
 
-    embed.description = (
-        "## 📚 Command Categories\n\n"
-        "🛡️ Moderation\n"
-        "👋 Welcome\n"
-        "🛠️ Utility\n"
-        "🎉 Fun\n"
-        "📊 Polls\n"
-        "⭐ Leveling\n"
-        "⏰ Reminders\n"
-        "⚙️ Configuration\n"
-        "📝 Logging\n\n"
-        "Type `/` to see every available command."
+    embed.add_field(
+        name="💬 Prefix Commands",
+        value=f"Use `{prefix}help` for text commands.",
+        inline=False,
     )
+
+    embed.add_field(
+        name="⚡ Slash Commands",
+        value="Type **/** to view all slash commands.",
+        inline=False,
+    )
+
+    embed.set_footer(
+        text=f"{self.settings.bot_name} • Version {self.settings.version}"
+    )
+
+    if self.bot.user:
+        embed.set_thumbnail(url=self.bot.user.display_avatar.url)
 
     await interaction.response.send_message(embed=embed)
-
-    async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send(embed=embeds.error(self.settings, "You need the Manage Messages permission for that."))
-            return
-        await ctx.send(embed=embeds.error(self.settings, f"Something went wrong: {error}"))
-
-
-async def setup(bot: commands.Bot):
-    cog = Utility(bot)
-    await bot.add_cog(cog)
