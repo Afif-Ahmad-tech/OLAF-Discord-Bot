@@ -1,58 +1,182 @@
-# OLAF Discord Bot
+<div align="center">
 
-OLAF is a Discord bot built with `discord.js` that:
+# 🤖 OLAF Discord Bot
 
-- supports slash commands
-- can answer in chat when mentioned
-- has a fixed creator response: `Mr Afif created me`
-- can optionally use OpenAI for better answers if `OPENAI_API_KEY` is set
+### ✨ A Modern, Powerful & Feature-Rich Discord Bot built with Python
 
-## Features
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=22&pause=1000&color=00BFFF&center=true&vCenter=true&width=700&lines=Moderation+%F0%9F%9B%A1%EF%B8%8F;Utility+%F0%9F%9B%A0%EF%B8%8F;Leveling+%F0%9F%93%88;Polls+%F0%9F%93%8A;Logging+%F0%9F%93%9D;Welcome+System+%F0%9F%91%8B;Built+with+Python+%F0%9F%90%8D" />
 
-- `/ping` - simple latency check
-- `/help` - shows available commands
-- `/ask` - ask OLAF a question
-- `/creator` - shows who created OLAF
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python)
+![Discord.py](https://img.shields.io/badge/Discord.py-Latest-5865F2?style=for-the-badge&logo=discord)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 
-OLAF also responds in plain chat when someone asks who created it.
+</div>
 
-## Setup
+---
 
-1. Install Node.js 18 or newer.
-2. In this folder, install dependencies:
+# 🌟 About OLAF
 
-   ```bash
-   npm install
-   ```
+OLAF is a **multi-purpose Discord bot** designed to make server management simple while keeping your community fun and engaging.
 
-3. Copy `.env.example` to `.env` and fill in your values.
-4. Deploy commands to your server:
+Whether you need moderation, utility tools, leveling, reminders, logging, or community features, OLAF has you covered.
 
-   ```bash
-   npm run deploy:commands
-   ```
+---
 
-5. Start the bot:
+# 🚀 Features
 
-   ```bash
-   npm start
-   ```
+## 🛡️ Moderation
 
-## Required Discord Settings
+- 🔨 Ban Members
+- 👢 Kick Members
+- 🔇 Timeout Members
+- 🧹 Purge Messages
+- ⚠️ Warning System
 
-Create a Discord application and bot at the Discord Developer Portal, then add the bot token and application client ID to `.env`.
+---
 
-## Notes
+## 🎉 Community
 
-- If `OPENAI_API_KEY` is not set, OLAF will still work, but `/ask` will use a simple fallback response.
-- The creator response is hardcoded to: `Mr Afif created me`
+- 👋 Welcome Messages
+- 📢 Server Announcements
+- 📊 Poll Creation
+- 📝 Logging System
 
-## GitHub Ready
+---
 
-This project includes:
+## 📈 Leveling
 
-- source files
-- environment example
-- ignore rules
-- install and run instructions
+- ⭐ XP System
+- 🏆 Leaderboards
+- 🎖️ Rank Cards
 
+---
+
+## ⏰ Utility
+
+- ⏳ Reminders
+- 📅 Timers
+- 📌 Server Information
+- 👤 User Information
+- 🛠️ Helpful Commands
+
+---
+
+## 🎲 Fun
+
+- 🎯 Interactive Commands
+- 🎉 Entertainment Features
+- 😂 Community Fun
+
+---
+
+# 📂 Project Structure
+
+```
+OLAF/
+│
+├── bot.py
+├── config.py
+├── requirements.txt
+├── README.md
+│
+├── cogs/
+│   ├── moderation.py
+│   ├── welcome.py
+│   ├── utility.py
+│   ├── fun.py
+│   ├── polls.py
+│   ├── leveling.py
+│   ├── reminders.py
+│   ├── logging.py
+│   └── config.py
+│
+└── assets/
+```
+
+---
+
+# ⚡ Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/Afif-Ahmad-tech/OLAF-Discord-Bot.git
+```
+
+Go inside the folder
+
+```bash
+cd OLAF-Discord-Bot
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the bot
+
+```bash
+python bot.py
+```
+
+---
+
+# ⚙️ Requirements
+
+- Python 3.10+
+- Discord Bot Token
+- Discord Developer Application
+
+---
+
+# 💡 Roadmap
+
+- [ ] Slash Commands
+- [ ] AI Integration
+- [ ] Music System
+- [ ] Ticket System
+- [ ] Giveaway System
+- [ ] Dashboard
+- [ ] Web Panel
+- [ ] Economy System
+- [ ] Auto Moderation
+- [ ] Multi-language Support
+
+---
+
+# 🤝 Contributing
+
+Contributions are always welcome!
+
+Feel free to:
+
+- 🍴 Fork the repository
+- 🌟 Star the project
+- 🐛 Report bugs
+- 💡 Suggest features
+- 🔧 Submit Pull Requests
+
+---
+
+# ⭐ Support
+
+If you like this project,
+
+⭐ **Give this repository a Star!**
+
+It helps a lot ❤️
+
+---
+
+<div align="center">
+
+## 👨‍💻 Developer
+
+**Afif Ahmad**
+
+Made with ❤️ using **Python** & **Discord.py**
+
+</div>
